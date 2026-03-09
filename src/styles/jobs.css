@@ -1,0 +1,269 @@
+/* ─── HERO SECTION ──────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f172a 100%);
+  padding: 80px 32px;
+  text-align: center;
+}
+
+.hero-title {
+  color: #ffffff;
+  font-size: 48px;
+  font-weight: 900;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.hero-title span {
+  color: #4f8ef7;
+}
+
+.hero-subtitle {
+  color: #94a3b8;
+  font-size: 18px;
+  margin-bottom: 36px;
+}
+
+.hero-search {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  width: 320px;
+  outline: none;
+  background: #ffffff;
+}
+
+.search-btn {
+  background: #4f8ef7;
+  color: #ffffff;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.search-btn:hover {
+  background: #3b7de8;
+}
+
+.hero-badges {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+.hero-badge {
+  background: rgba(79, 142, 247, 0.15);
+  color: #4f8ef7;
+  border: 1px solid rgba(79, 142, 247, 0.3);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ─── SECTION ───────────────────────────────────────────────────────────── */
+.section {
+  padding: 48px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.section-sub {
+  color: #64748b;
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+/* ─── JOB GRID ──────────────────────────────────────────────────────────── */
+.job-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+/* ─── JOB CARD ──────────────────────────────────────────────────────────── */
+.job-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.job-card:hover {
+  box-shadow: 0 8px 32px rgba(79, 142, 247, 0.18);
+  border-color: #4f8ef7;
+  transform: translateY(-2px);
+}
+
+.job-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.job-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4f8ef7, #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.job-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+
+.job-company {
+  color: #4f8ef7;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.job-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.job-meta-item {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.job-skills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.skill-tag {
+  background: #f0f4ff;
+  color: #4f8ef7;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.job-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-salary {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.apply-btn {
+  background: #4f8ef7;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.apply-btn:hover {
+  background: #3b7de8;
+}
+
+/* ─── CTA SECTION ───────────────────────────────────────────────────────── */
+.cta-section {
+  background: #0f172a;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.cta-title {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.cta-sub {
+  color: #94a3b8;
+  font-size: 16px;
+  margin-bottom: 28px;
+}
+
+.cta-btn {
+  background: #4f8ef7;
+  color: #ffffff;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cta-btn:hover {
+  background: #3b7de8;
+}
+
+/* ─── FOOTER ────────────────────────────────────────────────────────────── */
+.footer {
+  background: #1e293b;
+  padding: 20px;
+  text-align: center;
+  color: #475569;
+  font-size: 13px;
+}
+
+/* ─── NO RESULTS ────────────────────────────────────────────────────────── */
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 30px;
+  }
+  .job-grid {
+    grid-template-columns: 1fr;
+  }
+  .section {
+    padding: 32px 16px;
+  }
+}

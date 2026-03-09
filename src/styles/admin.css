@@ -1,0 +1,36 @@
+/* ─── ADMIN SPECIFIC STYLES ─────────────────────────────────────────────── */
+
+.admin-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-panel-header .panel-title {
+  margin-bottom: 0;
+}
+
+.online-dot {
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* User role badges in table */
+.role-badge-user {
+  background: rgba(79, 142, 247, 0.15);
+  color: #4f8ef7;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.role-badge-recruiter {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 12px;
+}
