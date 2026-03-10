@@ -1,35 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import JobCard from "../../components/Jobcard";
 import "../../styles/dashboard.css";
 import "../../styles/jobs.css";
 
-const sampleJobs = [
-  { id: 1, title: "Frontend Developer", company: "TechCorp",    location: "Bangalore", type: "Full-time", salary: "₹8-12 LPA",  skills: ["React", "CSS", "JS"],         posted: "2 days ago", logo: "TC" },
-  { id: 2, title: "Data Analyst",        company: "DataVision",  location: "Hyderabad", type: "Full-time", salary: "₹6-10 LPA",  skills: ["Python", "SQL", "Excel"],     posted: "1 day ago",  logo: "DV" },
-  { id: 3, title: "UI/UX Designer",      company: "CreativeHub", location: "Remote",    type: "Contract",  salary: "₹5-8 LPA",   skills: ["Figma", "Sketch", "XD"],     posted: "3 days ago", logo: "CH" },
-  { id: 4, title: "Backend Engineer",    company: "CloudBase",   location: "Mumbai",    type: "Full-time", salary: "₹10-18 LPA", skills: ["Node.js", "AWS", "MongoDB"],  posted: "Today",      logo: "CB" },
-];
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function UserDashboard({ showToast }) {
-  const raw  = localStorage.getItem("jobnest_user");
-  const user = raw ? JSON.parse(raw) : null;
-
-  // ✅ FIX: Supabase stores name in user_metadata.full_name, not user.name
-  const userName  = user?.user_metadata?.full_name || user?.email || "User";
+  const raw      = localStorage.getItem("jobnest_user");
+  const user     = raw ? JSON.parse(raw) : null;
+  const token    = localStorage.getItem("jobnest_token");
+  const userName = user?.user_metadata?.full_name || user?.email || "User";
   const userEmail = user?.email || "";
 
   const [activeTab, setActiveTab] = useState("browse");
+  const [jobs, setJobs]           = useState([]);
   const [applied, setApplied]     = useState([]);
   const [profile, setProfile]     = useState({ skills: "", experience: "", summary: "" });
+  const [loading, setLoading]     = useState(true);
+  const [search, setSearch]       = useState("");
 
-  const handleApply = (job) => {
-    if (applied.find((j) => j.id === job.id)) {
+  // ✅ Fetch real jobs from backend
+  useEffect(() => {
+    fetch(`${API}/jobs`)
+      .then(r => r.json())
+      .then(data => { setJobs(data.jobs || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  // ✅ Fetch real applications from backend
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${API}/applications/my`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(data => setApplied(data.applications || []))
+      .catch(() => {});
+  }, [token]);
+
+  const filtered = jobs.filter((job) =>
+    job.title?.toLowerCase().includes(search.toLowerCase()) ||
+    job.company?.toLowerCase().includes(search.toLowerCase()) ||
+    job.skills?.some((s) => s.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  // ✅ Save application to real database
+  const handleApply = async (job) => {
+    const alreadyApplied = applied.find(a => a.job_id === job.id);
+    if (alreadyApplied) {
       showToast && showToast("You already applied to this job!");
       return;
     }
-    setApplied([...applied, { ...job, status: "Under Review", appliedOn: "Today" }]);
-    showToast && showToast(`Applied to ${job.title} at ${job.company}! ✅`);
-    setActiveTab("applications");
+
+    try {
+      const res = await fetch(`${API}/applications`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ job_id: job.id })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      // Refresh applications
+      const appsRes = await fetch(`${API}/applications/my`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const appsData = await appsRes.json();
+      setApplied(appsData.applications || []);
+
+      showToast && showToast(`Applied to ${job.title} at ${job.company}! ✅`);
+      setActiveTab("applications");
+    } catch (err) {
+      showToast && showToast(`Failed: ${err.message}`);
+    }
   };
 
   const handleLogout = () => {
@@ -40,27 +86,22 @@ export default function UserDashboard({ showToast }) {
 
   return (
     <div className="dash-page">
-
       <div className="dash-header">
         <span className="dash-title">👤 User Dashboard</span>
         <div className="dash-user">
-          {/* ✅ FIX: use userName which is safely derived */}
           <div className="avatar">{userName[0].toUpperCase()}</div>
           <span>{userName}</span>
-          <button
-            onClick={handleLogout}
-            style={{ marginLeft: "12px", padding: "6px 14px", background: "none", border: "1px solid #fecaca", color: "#ef4444", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}
-          >
+          <button onClick={handleLogout}
+            style={{ marginLeft: "12px", padding: "6px 14px", background: "none", border: "1px solid #fecaca", color: "#ef4444", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>
             Logout
           </button>
         </div>
       </div>
 
       <div className="dash-content">
-
         <div className="stat-grid">
           <div className="stat-card">
-            <div className="stat-num">{sampleJobs.length}</div>
+            <div className="stat-num">{jobs.length}</div>
             <div className="stat-label">Jobs Available</div>
           </div>
           <div className="stat-card green">
@@ -68,7 +109,7 @@ export default function UserDashboard({ showToast }) {
             <div className="stat-label">Applied Jobs</div>
           </div>
           <div className="stat-card yellow">
-            <div className="stat-num">{applied.filter((j) => j.status === "Shortlisted").length}</div>
+            <div className="stat-num">{applied.filter(a => a.status === "Shortlisted").length}</div>
             <div className="stat-label">Shortlisted</div>
           </div>
         </div>
@@ -87,14 +128,18 @@ export default function UserDashboard({ showToast }) {
 
         {activeTab === "browse" && (
           <div>
-            <h2 style={{ fontSize: "20px", fontWeight: 800, marginBottom: "20px", color: "#0f172a" }}>
-              🔥 Jobs Matching Your Profile
-            </h2>
-            <div className="job-grid">
-              {sampleJobs.map((job) => (
-                <JobCard key={job.id} job={job} onApply={handleApply} />
-              ))}
+            <div style={{ marginBottom: "20px" }}>
+              <input className="form-input" placeholder="🔍 Search jobs, skills or companies..."
+                value={search} onChange={(e) => setSearch(e.target.value)}
+                style={{ maxWidth: "400px" }} />
             </div>
+            {loading ? <p>Loading jobs...</p> : filtered.length === 0 ? <p>No jobs found.</p> : (
+              <div className="job-grid">
+                {filtered.map(job => (
+                  <JobCard key={job.id} job={job} onApply={handleApply} />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -109,20 +154,15 @@ export default function UserDashboard({ showToast }) {
             ) : (
               <table className="data-table">
                 <thead>
-                  <tr>
-                    <th>Job Title</th>
-                    <th>Company</th>
-                    <th>Applied On</th>
-                    <th>Status</th>
-                  </tr>
+                  <tr><th>Job Title</th><th>Company</th><th>Applied On</th><th>Status</th></tr>
                 </thead>
                 <tbody>
-                  {applied.map((job) => (
-                    <tr key={job.id}>
-                      <td><strong>{job.title}</strong></td>
-                      <td>{job.company}</td>
-                      <td>{job.appliedOn}</td>
-                      <td><span className="badge-blue">{job.status}</span></td>
+                  {applied.map(app => (
+                    <tr key={app.id}>
+                      <td><strong>{app.jobs?.title || "—"}</strong></td>
+                      <td>{app.jobs?.company || "—"}</td>
+                      <td>{new Date(app.applied_at).toLocaleDateString()}</td>
+                      <td><span className="badge-blue">{app.status}</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -145,30 +185,18 @@ export default function UserDashboard({ showToast }) {
               </div>
               <div className="form-group">
                 <label className="form-label">Skills (comma separated)</label>
-                <input
-                  className="form-input"
-                  placeholder="React, Python, SQL..."
-                  value={profile.skills}
-                  onChange={(e) => setProfile({ ...profile, skills: e.target.value })}
-                />
+                <input className="form-input" placeholder="React, Python, SQL..."
+                  value={profile.skills} onChange={(e) => setProfile({ ...profile, skills: e.target.value })} />
               </div>
               <div className="form-group">
                 <label className="form-label">Experience</label>
-                <input
-                  className="form-input"
-                  placeholder="e.g. 2 years"
-                  value={profile.experience}
-                  onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
-                />
+                <input className="form-input" placeholder="e.g. 2 years"
+                  value={profile.experience} onChange={(e) => setProfile({ ...profile, experience: e.target.value })} />
               </div>
               <div className="form-group full-width">
                 <label className="form-label">Resume Summary</label>
-                <textarea
-                  className="form-textarea"
-                  placeholder="Write a brief summary about yourself..."
-                  value={profile.summary}
-                  onChange={(e) => setProfile({ ...profile, summary: e.target.value })}
-                />
+                <textarea className="form-textarea" placeholder="Write a brief summary..."
+                  value={profile.summary} onChange={(e) => setProfile({ ...profile, summary: e.target.value })} />
               </div>
             </div>
             <button className="btn-primary" onClick={() => showToast && showToast("Profile updated! ✅")}>
@@ -176,7 +204,6 @@ export default function UserDashboard({ showToast }) {
             </button>
           </div>
         )}
-
       </div>
     </div>
   );
